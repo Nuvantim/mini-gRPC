@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package ecommerce;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "micro/generated";
+
+message Category {
+	int64 id = 1;
+	string name = 2;
+	// google.protobuf.Timestamp create_at = 3;
+	// google.protobuf.Timestamp update_at = 4;
+}
+
+// List Category
+message ListCategoryResponse {
+	repeated Category category = 1;
+}
+
+// Insert Category
+message CreateCategoryRequest {
+	string name = 1;
+}
+
+message CreateCategoryResponse {
+	Category category = 1;
+}
+
+// Get Category
+message GetCategoryRequest {
+	int64 id = 1;
+}
+
+message GetCategoryResponse {
+	Category category = 1;
+}
+
+// Update Category
+message UpdateCategoryRequest {
+	int64 id = 1;
+	string nama = 2;
+}
+
+message UpdateCategoryResponse {
+	Category category = 1;
+}
+
+// Delete Category
+message DeleteCategoryRequest{
+	int64 id = 1;
+}
+message DeleteCategoryResponse{
+	bool success = 1;
+}
+
+service CategoryService {
+	rpc ListCategory(google.protobuf.Empty) returns (ListCategoryResponse);
+	rpc CreateCategory(CreateCategoryRequest) returns (CreateCategoryResponse);
+	rpc GetCategory(GetCategoryRequest) returns (GetCategoryResponse);
+	rpc UpdateCategory(UpdateCategoryRequest) returns (UpdateCategoryResponse);
+	rpc DeleteCategory(DeleteCategoryRequest) returns (DeleteCategoryResponse);
+}
