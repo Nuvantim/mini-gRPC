@@ -1,25 +1,31 @@
-package main 
+package main
 
 import (
-	"context"
-	"fmt"
-	"log"
+	"connectrpc.com/connect"
+	"golang.org/x/net/http2/h2c"
 	"net/http"
 
-	"connectrpc.com/connect"
-	"golang.org/x/net/http2"
-	"golang.org/x/net/http2/h2c"
-
-	greetv1 "example/greet/v1"
+	greetv1 "example/gen/greet/v1"
 	"example/gen/greet/v1/greetv1connect"
+)
+
+type (
+	GreetReq  = connect.Request[greetv1.GreetRequest]
+	GreetRes  = connect.Response[greetv1.GreetResponse]
 )
 
 type GreetServer struct{}
 
-func (s *GreetServer ) Greet(ctx context.Context,req *connect.Request[greetv1.GreetRequest],) (*connect.Response[greetv1.GreetResponse], error) {
-	
+func (s *GreetServer) Greet(_ context.Context, req *GreetReq) (*GreetRes, error) {
+	return &GreetRes{
+		Msg: &greetv1.GreetResponse{
+			Greeting: "Hello, " + req.Msg.Name + "!",
+		},
+	}, nil
 }
 
-func main(){
-
+func main() {
+	mux := http.NewServeMux()
+	mux.Handle(greetv1connect.NewGreetServiceHandler(&GreetServer{}))
+	http.ListenAndServe(":8080", h2c.NewHandler(mux, new(http2.Server)))
 }
