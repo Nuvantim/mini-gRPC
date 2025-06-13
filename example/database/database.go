@@ -6,6 +6,7 @@ import (
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"os"
+	"time"
 )
 
 var db *sqlx.DB

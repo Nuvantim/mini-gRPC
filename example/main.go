@@ -1,11 +1,9 @@
 package main
 
 import (
-	"connectrpc.com/connect"
-	"context"
 	"example/config"
 	"example/database"
-	"example/gen/category/v1/categoryv1connect"
+	"example/rpc/proto/v1/categoryconnect"
 	"example/service"
 	"log"
 	"net/http"
@@ -26,7 +24,7 @@ func main() {
 
 	// Setup HTTP server
 	mux := http.NewServeMux()
-	path, handler := categoryv1connect.NewCategoryServiceHandler(categoryService)
+	path, handler := categoryconnect.NewCategoryServiceHandler(categoryService)
 	mux.Handle(path, handler)
 
 	// Add CORS middleware

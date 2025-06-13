@@ -3,24 +3,25 @@ package service
 import (
 	"connectrpc.com/connect"
 	"context"
-	"example/gen/category/v1/categoryv1connect"
 	"example/helper"
 	"example/repository"
 
-	"example/gen/category/v1"
+	"errors"
+	"github.com/jmoiron/sqlx"
+	pb "example/pb/proto/v1"
 )
 
 type (
-	CreateCategory = connect.Request[categoryv1.CreateCategoryRequest]
-	CreateCategoryResponse = connect.Response[categoryv1.CreateCategoryResponse]
-	GetCategoryRequest = connect.Request[categoryv1.GetCategoryRequest]
-	GetCategoryResponse = connect.Response[categoryv1.GetCategoryResponse]
-	ListCategoriesRequest = connect.Request[categoryv1.ListCategoriesRequest]
-	ListCategoriesResponse = connect.Response[categoryv1.ListCategoriesResponse]
-	UpdateCategoryRequest = connect.Request[categoryv1.UpdateCategoryRequest]
-	UpdateCategoryResponse = connect.Response[categoryv1.UpdateCategoryResponse]
-	DeleteCategoryRequest = connect.Request[categoryv1.DeleteCategoryRequest]
-	DeleteCategoryResponse = connect.Response[categoryv1.DeleteCategoryResponse]
+	CreateCategoryRequest = connect.Request[pb.CreateCategoryRequest]
+	CreateCategoryResponse = connect.Response[pb.CreateCategoryResponse]
+	GetCategoryRequest = connect.Request[pb.GetCategoryRequest]
+	GetCategoryResponse = connect.Response[pb.GetCategoryResponse]
+	ListCategoriesRequest = connect.Request[pb.ListCategoriesRequest]
+	ListCategoriesResponse = connect.Response[pb.ListCategoriesResponse]
+	UpdateCategoryRequest = connect.Request[pb.UpdateCategoryRequest]
+	UpdateCategoryResponse = connect.Response[pb.UpdateCategoryResponse]
+	DeleteCategoryRequest = connect.Request[pb.DeleteCategoryRequest]
+	DeleteCategoryResponse = connect.Response[pb.DeleteCategoryResponse]
 )
 
 type CategoryService struct {
@@ -33,18 +34,18 @@ func NewCategoryService(db *sqlx.DB) *CategoryService {
 	}
 }
 
-func (s *CategoryService) CreateCategory(ctx context.Context,req *CreateCategory,) (*CreateCategoryResponse, error) {
+func (s *CategoryService) CreateCategory(ctx context.Context,req *CreateCategoryRequest,) (*CreateCategoryResponse, error) {
 	category, err := s.repo.Create(ctx, req.Msg.Name, req.Msg.Description)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	return connect.NewResponse(&categoryv1.CreateCategoryResponse{
+	return connect.NewResponse(&pb.CreateCategoryResponse{
 		Category: helper.CategoryToProto(category),
 	}), nil
 }
 
-func (s *CategoryService) GetCategory(ctx context.Context,req *GetCategory,) (*GetCategoryResponse, error) {
+func (s *CategoryService) GetCategory(ctx context.Context,req *GetCategoryRequest,) (*GetCategoryResponse, error) {
 	category, err := s.repo.GetByID(ctx, req.Msg.Id)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, err)
@@ -53,7 +54,7 @@ func (s *CategoryService) GetCategory(ctx context.Context,req *GetCategory,) (*G
 		return nil, connect.NewError(connect.CodeNotFound, errors.New("category not found"))
 	}
 
-	return connect.NewResponse(&categoryv1.GetCategoryResponse{
+	return connect.NewResponse(&pb.GetCategoryResponse{
 		Category: helper.CategoryToProto(category),
 	}), nil
 }
@@ -64,12 +65,12 @@ func (s *CategoryService) ListCategories(ctx context.Context,req *ListCategories
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	protoCategories := make([]*categoryv1.Category, 0, len(categories))
+	protoCategories := make([]*pb.Category, 0, len(categories))
 	for _, cat := range categories {
 		protoCategories = append(protoCategories, helper.CategoryToProto(&cat))
 	}
 
-	return connect.NewResponse(&categoryv1.ListCategoriesResponse{
+	return connect.NewResponse(&pb.ListCategoriesResponse{
 		Categories: protoCategories,
 	}), nil
 }
@@ -80,7 +81,7 @@ func (s *CategoryService) UpdateCategory(ctx context.Context,req *UpdateCategory
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	return connect.NewResponse(&categoryv1.UpdateCategoryResponse{
+	return connect.NewResponse(&pb.UpdateCategoryResponse{
 		Category: helper.CategoryToProto(category),
 	}), nil
 }
@@ -91,7 +92,7 @@ func (s *CategoryService) DeleteCategory(ctx context.Context,req *DeleteCategory
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	return connect.NewResponse(&categoryv1.DeleteCategoryResponse{
+	return connect.NewResponse(&pb.DeleteCategoryResponse{
 		Success: success,
 	}), nil
 }

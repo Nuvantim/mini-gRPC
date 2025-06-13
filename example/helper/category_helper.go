@@ -1,14 +1,13 @@
 package helper
 
 import (
-	"example/gen/category/v1"
-	"example/repository"
+	pb "example/pb/proto/v1"
+	"example/models"
 )
 
-func CategoryToProto(c *repository.Category) *categoryv1.Category {
-	return &categoryv1.Category{
+func CategoryToProto(c *models.Category) *pb.Category {
+	return &pb.Category{
 		Id:          c.ID,
 		Name:        c.Name,
-		Description: c.Description,
 	}
 }

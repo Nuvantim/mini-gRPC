@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"time"
 
 	"github.com/jmoiron/sqlx"
 	"example/models"
@@ -25,7 +24,7 @@ func (r *CategoryRepository) Create(ctx context.Context, name, description strin
 		RETURNING id, name, description, created_at, updated_at
 	`
 
-	var category Category
+	var category models.Category
 	err := r.db.QueryRowxContext(ctx, query, name, description).StructScan(&category)
 	if err != nil {
 		return nil, err
@@ -41,7 +40,7 @@ func (r *CategoryRepository) GetByID(ctx context.Context, id string) (*models.Ca
 		WHERE id = $1
 	`
 
-	var category Category
+	var category models.Category
 	err := r.db.QueryRowxContext(ctx, query, id).StructScan(&category)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -53,14 +52,14 @@ func (r *CategoryRepository) GetByID(ctx context.Context, id string) (*models.Ca
 	return &category, nil
 }
 
-func (r *CategoryRepository) List(ctx context.Context) ([]Category, error) {
+func (r *CategoryRepository) List(ctx context.Context) ([]models.Category, error) {
 	const query = `
 		SELECT id, name, description, created_at, updated_at
 		FROM categories
 		ORDER BY created_at DESC
 	`
 
-	var categories []Category
+	var categories []models.Category
 	err := r.db.SelectContext(ctx, &categories, query)
 	if err != nil {
 		return nil, err
@@ -77,7 +76,7 @@ func (r *CategoryRepository) Update(ctx context.Context, id, name, description s
 		RETURNING id, name, description, created_at, updated_at
 	`
 
-	var category Category
+	var category models.Category
 	err := r.db.QueryRowxContext(ctx, query, id, name, description).StructScan(&category)
 	if err != nil {
 		return nil, err

@@ -1,5 +1,8 @@
 version: v2
 plugins:
+  - local: protoc-gen-go
+    out: pb
+    opt: paths=source_relative
   - local: protoc-gen-connect-go
-    out: gen 
+    out: rpc
     opt: paths=source_relative
