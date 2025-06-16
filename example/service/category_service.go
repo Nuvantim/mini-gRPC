@@ -7,20 +7,20 @@ import (
 	"example/repository"
 
 	"errors"
+	pb "example/pb/proto/category/v1"
 	"github.com/jmoiron/sqlx"
-	pb "example/pb/proto/v1"
 )
 
 type (
-	CreateCategoryRequest = connect.Request[pb.CreateCategoryRequest]
+	CreateCategoryRequest  = connect.Request[pb.CreateCategoryRequest]
 	CreateCategoryResponse = connect.Response[pb.CreateCategoryResponse]
-	GetCategoryRequest = connect.Request[pb.GetCategoryRequest]
-	GetCategoryResponse = connect.Response[pb.GetCategoryResponse]
-	ListCategoriesRequest = connect.Request[pb.ListCategoriesRequest]
+	GetCategoryRequest     = connect.Request[pb.GetCategoryRequest]
+	GetCategoryResponse    = connect.Response[pb.GetCategoryResponse]
+	ListCategoriesRequest  = connect.Request[pb.ListCategoriesRequest]
 	ListCategoriesResponse = connect.Response[pb.ListCategoriesResponse]
-	UpdateCategoryRequest = connect.Request[pb.UpdateCategoryRequest]
+	UpdateCategoryRequest  = connect.Request[pb.UpdateCategoryRequest]
 	UpdateCategoryResponse = connect.Response[pb.UpdateCategoryResponse]
-	DeleteCategoryRequest = connect.Request[pb.DeleteCategoryRequest]
+	DeleteCategoryRequest  = connect.Request[pb.DeleteCategoryRequest]
 	DeleteCategoryResponse = connect.Response[pb.DeleteCategoryResponse]
 )
 
@@ -34,8 +34,8 @@ func NewCategoryService(db *sqlx.DB) *CategoryService {
 	}
 }
 
-func (s *CategoryService) CreateCategory(ctx context.Context,req *CreateCategoryRequest,) (*CreateCategoryResponse, error) {
-	category, err := s.repo.Create(ctx, req.Msg.Name, req.Msg.Description)
+func (s *CategoryService) CreateCategory(ctx context.Context, req *CreateCategoryRequest) (*CreateCategoryResponse, error) {
+	category, err := s.repo.Create(ctx, req.Msg.Name)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
@@ -45,7 +45,7 @@ func (s *CategoryService) CreateCategory(ctx context.Context,req *CreateCategory
 	}), nil
 }
 
-func (s *CategoryService) GetCategory(ctx context.Context,req *GetCategoryRequest,) (*GetCategoryResponse, error) {
+func (s *CategoryService) GetCategory(ctx context.Context, req *GetCategoryRequest) (*GetCategoryResponse, error) {
 	category, err := s.repo.GetByID(ctx, req.Msg.Id)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, err)
@@ -59,7 +59,7 @@ func (s *CategoryService) GetCategory(ctx context.Context,req *GetCategoryReques
 	}), nil
 }
 
-func (s *CategoryService) ListCategories(ctx context.Context,req *ListCategoriesRequest,) (*ListCategoriesResponse, error) {
+func (s *CategoryService) ListCategories(ctx context.Context, req *ListCategoriesRequest) (*ListCategoriesResponse, error) {
 	categories, err := s.repo.List(ctx)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, err)
@@ -75,8 +75,8 @@ func (s *CategoryService) ListCategories(ctx context.Context,req *ListCategories
 	}), nil
 }
 
-func (s *CategoryService) UpdateCategory(ctx context.Context,req *UpdateCategoryRequest,) (*UpdateCategoryResponse, error) {
-	category, err := s.repo.Update(ctx, req.Msg.Id, req.Msg.Name, req.Msg.Description)
+func (s *CategoryService) UpdateCategory(ctx context.Context, req *UpdateCategoryRequest) (*UpdateCategoryResponse, error) {
+	category, err := s.repo.Update(ctx, req.Msg.Id, req.Msg.Name)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
@@ -86,7 +86,7 @@ func (s *CategoryService) UpdateCategory(ctx context.Context,req *UpdateCategory
 	}), nil
 }
 
-func (s *CategoryService) DeleteCategory(ctx context.Context,req *DeleteCategoryRequest,) (*DeleteCategoryResponse, error) {
+func (s *CategoryService) DeleteCategory(ctx context.Context, req *DeleteCategoryRequest) (*DeleteCategoryResponse, error) {
 	success, err := s.repo.Delete(ctx, req.Msg.Id)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, err)

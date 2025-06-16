@@ -5,8 +5,8 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/jmoiron/sqlx"
 	"example/models"
+	"github.com/jmoiron/sqlx"
 )
 
 type CategoryRepository struct {
@@ -17,15 +17,15 @@ func NewCategoryRepository(db *sqlx.DB) *CategoryRepository {
 	return &CategoryRepository{db: db}
 }
 
-func (r *CategoryRepository) Create(ctx context.Context, name, description string) (*models.Category, error) {
+func (r *CategoryRepository) Create(ctx context.Context, name string) (*models.Category, error) {
 	const query = `
-		INSERT INTO categories (name, description)
+		INSERT INTO category (name)
 		VALUES ($1, $2)
-		RETURNING id, name, description, created_at, updated_at
+		RETURNING id, name
 	`
 
 	var category models.Category
-	err := r.db.QueryRowxContext(ctx, query, name, description).StructScan(&category)
+	err := r.db.QueryRowxContext(ctx, query, name).StructScan(&category)
 	if err != nil {
 		return nil, err
 	}
@@ -33,10 +33,10 @@ func (r *CategoryRepository) Create(ctx context.Context, name, description strin
 	return &category, nil
 }
 
-func (r *CategoryRepository) GetByID(ctx context.Context, id string) (*models.Category, error) {
+func (r *CategoryRepository) GetByID(ctx context.Context, id int64) (*models.Category, error) {
 	const query = `
-		SELECT id, name, description, created_at, updated_at
-		FROM categories
+		SELECT id, name
+		FROM category
 		WHERE id = $1
 	`
 
@@ -54,8 +54,8 @@ func (r *CategoryRepository) GetByID(ctx context.Context, id string) (*models.Ca
 
 func (r *CategoryRepository) List(ctx context.Context) ([]models.Category, error) {
 	const query = `
-		SELECT id, name, description, created_at, updated_at
-		FROM categories
+		SELECT id, name
+		FROM category
 		ORDER BY created_at DESC
 	`
 
@@ -68,16 +68,16 @@ func (r *CategoryRepository) List(ctx context.Context) ([]models.Category, error
 	return categories, nil
 }
 
-func (r *CategoryRepository) Update(ctx context.Context, id, name, description string) (*models.Category, error) {
+func (r *CategoryRepository) Update(ctx context.Context, id int64, name string) (*models.Category, error) {
 	const query = `
-		UPDATE categories
-		SET name = $2, description = $3, updated_at = NOW()
+		UPDATE category
+		SET name = $2 updated_at = NOW()
 		WHERE id = $1
-		RETURNING id, name, description, created_at, updated_at
+		RETURNING id, name
 	`
 
 	var category models.Category
-	err := r.db.QueryRowxContext(ctx, query, id, name, description).StructScan(&category)
+	err := r.db.QueryRowxContext(ctx, query, id, name).StructScan(&category)
 	if err != nil {
 		return nil, err
 	}
@@ -85,9 +85,9 @@ func (r *CategoryRepository) Update(ctx context.Context, id, name, description s
 	return &category, nil
 }
 
-func (r *CategoryRepository) Delete(ctx context.Context, id string) (bool, error) {
+func (r *CategoryRepository) Delete(ctx context.Context, id int64) (bool, error) {
 	const query = `
-		DELETE FROM categories
+		DELETE FROM category
 		WHERE id = $1
 	`
 

@@ -1,22 +1,22 @@
 syntax = "proto3";
 
-package proto.v1;
+package proto.product.v1;
 
-option go_package="example/pb/proto/v1;product";
+option go_package="example/pb/proto/v1/product;product";
 
 message Product {
-	int32 id = 1;
+	int64 id = 1;
 	string name = 2;
 	string description = 3;
-	int32 category_id = 4;
-	int32 price = 5;
+	int64 category_id = 4;
+	int64 price = 5;
 }
 
 message CreateProductRequest {
 	string name = 1;
 	string description = 2;
-	int32 category_id = 3;
-	int32 price = 4;
+	int64 category_id = 3;
+	int64 price = 4;
 }
 
 message CreateProductResponse {
@@ -40,8 +40,8 @@ message ListProductResponse {
 message UpdateProductRequest {
     string name = 1;
 	string description = 2;
-	int32 Product_id = 3;
-	int32 price = 4;
+	int64 product_id = 3;
+	int64 price = 4;
 }
 
 message UpdateProductResponse {
@@ -49,7 +49,7 @@ message UpdateProductResponse {
 }
 
 message DeleteProductRequest {
-    int32 id = 1;
+    int64 id = 1;
 }
 
 message DeleteProductResponse {

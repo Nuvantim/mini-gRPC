@@ -3,7 +3,7 @@ package main
 import (
 	"example/config"
 	"example/database"
-	"example/rpc/proto/v1/categoryconnect"
+	"example/rpc/proto/category/v1/categoryconnect"
 	"example/service"
 	"log"
 	"net/http"

@@ -1,13 +1,13 @@
 package helper
 
 import (
-	pb "example/pb/proto/v1"
 	"example/models"
+	pb "example/pb/proto/category/v1"
 )
 
 func CategoryToProto(c *models.Category) *pb.Category {
 	return &pb.Category{
-		Id:          c.ID,
-		Name:        c.Name,
+		Id:   c.ID,
+		Name: c.Name,
 	}
 }
