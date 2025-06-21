@@ -8,7 +8,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
-	"micro/internal/domain/repository" // sesuaikan dengan path Anda
+	"micro/internal/repository" // sesuaikan dengan path Anda
 )
 
 var (

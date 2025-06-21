@@ -12,8 +12,8 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"micro/internal/database"
-	"micro/internal/domain/repository"
+	"micro/database"
+	"micro/internal/repository"
 )
 
 type CategoryHandler struct {
@@ -134,7 +134,6 @@ func (h *CategoryHandler) getCategory(w http.ResponseWriter, r *http.Request, id
 func (h *CategoryHandler) createCategory(w http.ResponseWriter, r *http.Request) {
 	var req CategoryRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		log.Println(req)
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}

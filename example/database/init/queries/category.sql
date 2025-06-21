@@ -1,5 +1,5 @@
 -- name: CreateCategory :one
-INSERT INTO category (id,name) VALUES ($1,$2) RETURNING *;
+INSERT INTO category (name) VALUES ($1) RETURNING *;
 -- name: GetCategory :one
 SELECT * FROM category WHERE id = $1;
 -- name: ListCategory :many

@@ -1,49 +1,47 @@
 package database
 
 import (
-	"fmt"
-	"github.com/jmoiron/sqlx"
-	"github.com/joho/godotenv"
-	_ "github.com/lib/pq"
+	"context"
+	"log"
 	"os"
-	"time"
+	"sync"
+
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/joho/godotenv"
+	"micro/internal/repository" // sesuaikan dengan path Anda
 )
 
-var db *sqlx.DB
+var (
+	DB      *pgxpool.Pool
+	once    sync.Once
+	Queries *repository.Queries // Gunakan generated queries
+)
 
-// Connect initializes a singleton database connection
-func Connect() (*sqlx.DB, error) {
-	if db != nil {
-		return db, nil
-	}
-
-	if err := godotenv.Load(); err != nil {
-		return nil, fmt.Errorf("error loading .env file: %w", err)
-	}
-
-	connStr := fmt.Sprintf(
-		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		os.Getenv("DB_HOST"),
-		os.Getenv("DB_PORT"),
-		os.Getenv("DB_USER"),
-		os.Getenv("DB_PASSWORD"),
-		os.Getenv("DB_NAME"),
-	)
-
-	var err error
-	db, err = sqlx.Connect("postgres", connStr)
+func InitDB() {
+	err := godotenv.Load()
 	if err != nil {
-		return nil, fmt.Errorf("error connecting to database: %w", err)
+		log.Fatal("Error loading .env file")
 	}
+	once.Do(func() {
+		host := os.Getenv("DB_HOST")
+		user := os.Getenv("DB_USER")
+		password := os.Getenv("DB_PASSWORD")
+		port := os.Getenv("DB_PORT")
+		db_name := os.Getenv("DB_NAME")
+		var err error
+		var dsn string = "postgres://" + user + ":" + password + "@" + host + ":" + port + "/" + db_name
+		DB, err = pgxpool.New(context.Background(), dsn)
+		if err != nil {
+			log.Fatalf("Unable to create connection pool: %v", err)
+		}
 
-	db.SetMaxOpenConns(10)
-	db.SetMaxIdleConns(5)
-	db.SetConnMaxLifetime(5 * time.Minute)
-
-	return db, nil
+		// Inisialisasi Queries
+		Queries = repository.New(DB)
+	})
 }
 
-// GetDB returns the singleton database instance
-func GetDB() *sqlx.DB {
-	return db
+func CloseDB() {
+	if DB != nil {
+		DB.Close()
+	}
 }

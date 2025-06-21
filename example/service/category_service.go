@@ -5,6 +5,7 @@ import (
 	"context"
 	"example/helper"
 	"example/repository"
+	"example/database"
 
 	"errors"
 	pb "example/pb/proto/category/v1"
@@ -35,9 +36,23 @@ func NewCategoryService(db *sqlx.DB) *CategoryService {
 }
 
 func (s *CategoryService) CreateCategory(ctx context.Context, req *CreateCategoryRequest) (*CreateCategoryResponse, error) {
-	category, err := s.repo.Create(ctx, req.Msg.Name)
+	tx, err := database.DB.Begin(context.Background())
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		http.Error(w, "Failed to start transaction", http.StatusInternalServerError)
+		return
+	}
+	defer tx.Rollback(context.Background())
+	qtx := h.queries.WithTx(tx)
+
+	category, err := qtx.CreateCategory(context.Background(), req.Msg.Name)
+	if err != nil {
+		http.Error(w, "Failed to create category", http.StatusInternalServerError)
+		return
+	}
+
+	if err := tx.Commit(context.Background()); err != nil {
+		http.Error(w, "Failed to commit transaction", http.StatusInternalServerError)
+		return
 	}
 
 	return connect.NewResponse(&pb.CreateCategoryResponse{

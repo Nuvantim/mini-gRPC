@@ -1,9 +1,9 @@
 package server
 
 import (
-	"example/config"                      // Pastikan path ini benar
-	"example/rpc/proto/category/v1/categoryconnect" // Pastikan path ini benar
-	"example/service"                     // Pastikan path ini benar
+	"example/config"                     
+	"example/rpc/proto/category/v1/categoryconnect"
+	"example/service"                     
 	"net/http"
 
 	"github.com/rs/cors"

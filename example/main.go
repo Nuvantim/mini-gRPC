@@ -1,59 +1,36 @@
 package main
 
 import (
-	"example/config"
-	"example/database"
-	"example/rpc/proto/category/v1/categoryconnect"
-	"example/service"
+	"example/config"      
+	"example/database"    
+	"example/service"     
 	"log"
-	"net/http"
 
-	"github.com/rs/cors"
-	"golang.org/x/net/http2"
-	"golang.org/x/net/http2/h2c"
+	"example/server"
 )
 
 func main() {
-	// Initialize database
-	if _, err := database.Connect(); err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
-	}
+	// Inisialisasi database
+	database.InitDB()
+	defer database.CloseDB()
 
-	// Create services
+	// Buat instance layanan yang diperlukan
 	categoryService := &service.CategoryService{}
 
-	// Setup HTTP server
-	mux := http.NewServeMux()
-	path, handler := categoryconnect.NewCategoryServiceHandler(categoryService)
-	mux.Handle(path, handler)
+	// Inisialisasi server dengan layanan yang dibutuhkan
+	// Kami meneruskan categoryService ke fungsi NewServer
+	port := os.Getenv("PORT")
+	appServer := server.NewServer(":"+port, categoryService)
 
-	// Add CORS middleware
-	corsHandler := cors.New(cors.Options{
-		AllowedOrigins: []string{"*"},
-		AllowedMethods: []string{
-			http.MethodGet,
-			http.MethodPost,
-			http.MethodPut,
-			http.MethodDelete,
-		},
-		AllowedHeaders:   []string{"*"},
-		AllowCredentials: true,
-	}).Handler(h2c.NewHandler(config.LogRequest(mux), &http2.Server{}))
-
-	// Start server
-	server := &http.Server{
-		Addr:    ":8080",
-		Handler: corsHandler,
-	}
-
+	// Mulai server di goroutine terpisah
 	go func() {
-		log.Println("Server starting on :8080")
-		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		log.Println("Server starting on :"+port)
+		if err := appServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("Server error: %v", err)
 		}
 	}()
 
-	// Graceful shutdown
-	config.GracefulShutdown(server)
+	// Menangani graceful shutdown
+	config.GracefulShutdown(appServer.Server) // Mengakses http.Server dari struct Server Anda
 	log.Println("Server stopped")
 }
