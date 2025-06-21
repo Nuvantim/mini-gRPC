@@ -3,7 +3,7 @@ package server
 import (
 	"example/config"                     
 	"example/rpc/proto/category/v1/categoryconnect"
-	"example/service"                     
+	"example/internal/service"                     
 	"net/http"
 
 	"github.com/rs/cors"
@@ -11,8 +11,6 @@ import (
 	"golang.org/x/net/http2/h2c"
 )
 
-// Server adalah struct yang membungkus http.Server
-// untuk memungkinkan konfigurasi lebih lanjut.
 type Server struct {
 	*http.Server
 }

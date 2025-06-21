@@ -3,10 +3,10 @@ package main
 import (
 	"example/config"      
 	"example/database"    
-	"example/service"     
+	"example/internal/service"     
 	"log"
 
-	"example/server"
+	"example/internal/server"
 )
 
 func main() {

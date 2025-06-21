@@ -8,13 +8,13 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
-	"micro/internal/repository" // sesuaikan dengan path Anda
+	"example/internal/repository"
 )
 
 var (
 	DB      *pgxpool.Pool
 	once    sync.Once
-	Queries *repository.Queries // Gunakan generated queries
+	Queries *repository.Queries 
 )
 
 func InitDB() {
