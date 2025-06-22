@@ -17,6 +17,13 @@ func main() {
 		product.New(db.Queries).Register,  // Tanpa interface
 	)
 
-	log.Println("Server started on :8080")
-	log.Fatal(srv.ListenAndServe())
+	log.Println("Server starting on :"+port)
+	go func() {
+		if err := srv.ListenAndServe(); err != http.ErrServerClosed {
+			log.Fatalf("Server error: %v", err)
+		}
+	}()
+
+	config.GracefulShutdown(srv.Server)
+	log.Println("Server stopped gracefully")
 }
