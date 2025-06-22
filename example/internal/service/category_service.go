@@ -28,13 +28,10 @@ type CategoryService struct {
 	queries *repository.Queries
 }
 
-/*
-internal/server/server.go:25:61: 
-cannot use categoryService (variable of type *service.CategoryService) 
-as categoryconnect.CategoryServiceHandler value in argument to categoryconnect.NewCategoryServiceHandler: 
-*service.CategoryService does not implement categoryconnect.CategoryServiceHandler (missing method DeleteCategory)
+func NewCategoryService(queries *repository.Queries) *CategoryService {
+	return &CategoryService{queries: queries}
+}
 
-*/
 // Create Category
 func (s *CategoryService) CreateCategory(ctx context.Context, req *CreateCategoryRequest) (*CreateCategoryResponse, error) {
 	tx, err := database.DB.Begin(context.Background())
