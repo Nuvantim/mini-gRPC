@@ -1,9 +1,9 @@
 package server
 
 import (
-	"example/config"                     
-	"example/rpc/proto/category/v1/categoryconnect"
-	"example/internal/service"                     
+	"context"
+	"example/config"
+	"fmt"
 	"net/http"
 
 	"github.com/rs/cors"
@@ -15,29 +15,34 @@ type Server struct {
 	*http.Server
 }
 
-// NewServer membuat dan mengembalikan instance Server yang sudah dikonfigurasi.
-// Ini menerima alamat dan layanan yang akan di-serve.
-func NewServer(addr string, categoryService *service.CategoryService) *Server {
+type HandlerRegistrator func() (path string, handler http.Handler)
+
+func New(addr string,corsOpts cors.Options,services ...HandlerRegistrator,) (*Server, error) {
 	mux := http.NewServeMux()
 
-	// Daftarkan handler gRPC-Connect Anda
-	// Path dan handler diambil dari generated code
-	path, handler := categoryconnect.NewCategoryServiceHandler(categoryService)
-	mux.Handle(path, handler)
-
-	// Konfigurasi CORS middleware
-	corsHandler := cors.New(cors.Options{
-		AllowedOrigins:   []string{"*"}, // Izinkan semua origin untuk development
-		AllowedMethods:   []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete},
-		AllowedHeaders:   []string{"*"}, // Izinkan semua header
-		AllowCredentials: true,
-	}).Handler(h2c.NewHandler(config.LogRequest(mux), &http2.Server{}))
-
-	// Buat instance http.Server
-	s := &http.Server{
-		Addr:    addr,
-		Handler: corsHandler, // Gunakan handler dengan CORS dan h2c
+	// Registrasi handler dengan validasi
+	for _, register := range services {
+		path, handler := register()
+		if path == "" || handler == nil {
+			return nil, fmt.Errorf("invalid handler registration")
+		}
+		mux.Handle(path, handler)
 	}
 
-	return &Server{s}
+	// Middleware chain: CORS → Logging → h2c
+	handlerChain := cors.New(corsOpts).Handler(
+		config.LogRequest(mux), // Pastikan LogRequest aman untuk concurrent access
+	)
+
+	return &Server{
+		Server: &http.Server{
+			Addr:    addr,
+			Handler: h2c.NewHandler(handlerChain, &http2.Server{}),
+		},
+	}, nil
+}
+
+// Shutdown untuk graceful termination
+func (s *Server) Shutdown(ctx context.Context) error {
+	return s.Server.Shutdown(ctx)
 }
