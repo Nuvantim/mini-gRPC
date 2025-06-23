@@ -1,29 +1,34 @@
 package main
 
 import (
+	"example/config"
 	"example/database"
 	"example/internal/server"
-	"example/internal/service"
+	"github.com/joho/godotenv"
 	"log"
+	"net/http"
+	"os"
 )
 
 func main() {
-	db := database.InitDB()
-	defer db.Close()
-	port := os.Getenv("PORT")
-	srv := server.New(
-		":"+port,
-		category.New(db.Queries).Register, // Langsung pass method
-		product.New(db.Queries).Register,  // Tanpa interface
-	)
+	// Chechk env
+	godotenv.Load()
+	port := os.Getenv("PORT_SERVICE")
+	if port == "" {
+		log.Fatalf("Port Service Not Found")
+	}
 
-	log.Println("Server starting on :"+port)
+	srv := server.New(":" + port)
+
+	// Start server in goroutine for graceful shutdown
 	go func() {
-		if err := srv.ListenAndServe(); err != http.ErrServerClosed {
+		log.Printf("Server running on %s", srv.Addr)
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("Server error: %v", err)
 		}
 	}()
 
+	// Setup graceful shutdown
 	config.GracefulShutdown(srv.Server)
-	log.Println("Server stopped gracefully")
+	defer database.CloseDB()
 }

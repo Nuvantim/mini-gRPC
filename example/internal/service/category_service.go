@@ -3,9 +3,9 @@ package service
 import (
 	"connectrpc.com/connect"
 	"context"
+	"example/database"
 	"example/internal/helper"
 	"example/internal/repository"
-	"example/database"
 
 	"errors"
 	pb "example/pb/proto/category/v1"
@@ -56,57 +56,85 @@ func (s *CategoryService) CreateCategory(ctx context.Context, req *CreateCategor
 }
 
 // Get Category
-// func (s *CategoryService) GetCategory(ctx context.Context, req *GetCategoryRequest) (*GetCategoryResponse, error) {
-// 	category, err := s.repo.GetByID(ctx, req.Msg.Id)
-// 	if err != nil {
-// 		return nil, connect.NewError(connect.CodeInternal, err)
-// 	}
-// 	if category == nil {
-// 		return nil, connect.NewError(connect.CodeNotFound, errors.New("category not found"))
-// 	}
+func (s *CategoryService) GetCategory(ctx context.Context, req *GetCategoryRequest) (*GetCategoryResponse, error) {
+	category, err := s.queries.GetCategory(context.Background(), req.Msg.Id)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+	if category.ID == 0 {
+		return nil, connect.NewError(connect.CodeNotFound, errors.New("category not found"))
+	}
 
-// 	return connect.NewResponse(&pb.GetCategoryResponse{
-// 		Category: helper.CategoryToProto(category),
-// 	}), nil
-// }
+	return connect.NewResponse(&pb.GetCategoryResponse{
+		Category: helper.CategoryToProto(category),
+	}), nil
+}
 
 // List Category
-// func (s *CategoryService) ListCategories(ctx context.Context, req *ListCategoriesRequest) (*ListCategoriesResponse, error) {
-// 	categories, err := s.repo.List(ctx)
-// 	if err != nil {
-// 		return nil, connect.NewError(connect.CodeInternal, err)
-// 	}
+func (s *CategoryService) ListCategories(ctx context.Context, req *ListCategoriesRequest) (*ListCategoriesResponse, error) {
+	categories, err := s.queries.ListCategory(context.Background())
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
 
-// 	protoCategories := make([]*pb.Category, 0, len(categories))
-// 	for _, cat := range categories {
-// 		protoCategories = append(protoCategories, helper.CategoryToProto(&cat))
-// 	}
+	protoCategories := make([]*pb.Category, 0, len(categories))
+	for _, cat := range categories {
+		protoCategories = append(protoCategories, helper.CategoryToProto(cat))
+	}
 
-// 	return connect.NewResponse(&pb.ListCategoriesResponse{
-// 		Categories: protoCategories,
-// 	}), nil
-// }
+	return connect.NewResponse(&pb.ListCategoriesResponse{
+		Categories: protoCategories,
+	}), nil
+}
 
 // Update Category
-// func (s *CategoryService) UpdateCategory(ctx context.Context, req *UpdateCategoryRequest) (*UpdateCategoryResponse, error) {
-// 	category, err := s.repo.Update(ctx, req.Msg.Id, req.Msg.Name)
-// 	if err != nil {
-// 		return nil, connect.NewError(connect.CodeInternal, err)
-// 	}
+func (s *CategoryService) UpdateCategory(ctx context.Context, req *UpdateCategoryRequest) (*UpdateCategoryResponse, error) {
+	if req.Msg.Name == "" {
+		return nil, connect.NewError(connect.CodeNotFound, errors.New("Name is Required"))
+	}
+	// transaction
+	tx, err := database.DB.Begin(context.Background())
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, errors.New("Failed data transaction"))
+	}
+	defer tx.Rollback(context.Background())
 
-// 	return connect.NewResponse(&pb.UpdateCategoryResponse{
-// 		Category: helper.CategoryToProto(category),
-// 	}), nil
-// }
+	qtx := s.queries.WithTx(tx)
+
+	category, err := qtx.UpdateCategory(context.Background(), repository.UpdateCategoryParams{
+		ID:   req.Msg.Id,
+		Name: req.Msg.Name,
+	})
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	return connect.NewResponse(&pb.UpdateCategoryResponse{
+		Category: helper.CategoryToProto(category),
+	}), nil
+}
 
 // Delete Category
-// func (s *CategoryService) DeleteCategory(ctx context.Context, req *DeleteCategoryRequest) (*DeleteCategoryResponse, error) {
-// 	success, err := s.repo.Delete(ctx, req.Msg.Id)
-// 	if err != nil {
-// 		return nil, connect.NewError(connect.CodeInternal, err)
-// 	}
+func (s *CategoryService) DeleteCategory(ctx context.Context, req *DeleteCategoryRequest) (*DeleteCategoryResponse, error) {
+	// Start transaction
+	tx, err := database.DB.Begin(context.Background())
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+	defer tx.Rollback(context.Background())
 
-// 	return connect.NewResponse(&pb.DeleteCategoryResponse{
-// 		Success: success,
-// 	}), nil
-// }
+	qtx := s.queries.WithTx(tx)
+
+	err = qtx.DeleteCategory(context.Background(), req.Msg.Id)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	if err := tx.Commit(context.Background()); err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	return connect.NewResponse(&pb.DeleteCategoryResponse{
+		Success: true,
+	}), nil
+}

@@ -6,15 +6,15 @@ import (
 	"os"
 	"sync"
 
+	"example/internal/repository"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
-	"example/internal/repository"
 )
 
 var (
 	DB      *pgxpool.Pool
 	once    sync.Once
-	Queries *repository.Queries 
+	Queries *repository.Queries
 )
 
 func InitDB() {

@@ -27,3 +27,4 @@ go.work.sum
 # proto file
 pb/
 rpc/
+internal/repository/*
