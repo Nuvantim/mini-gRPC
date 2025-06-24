@@ -77,9 +77,9 @@ func (s *CategoryService) ListCategories(ctx context.Context, req *ListCategorie
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	protoCategories := make([]*pb.Category, 0, len(categories))
-	for _, cat := range categories {
-		protoCategories = append(protoCategories, helper.CategoryToProto(cat))
+	protoCategories := make([]*pb.Category, len(categories))
+	for i, ctg := range categories {
+		protoCategories[i] = helper.CategoryToProto(ctg)
 	}
 
 	return connect.NewResponse(&pb.ListCategoriesResponse{
