@@ -4,10 +4,11 @@ import (
 	"example/config"
 	"example/database"
 	"example/internal/server"
-	"github.com/joho/godotenv"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -20,15 +21,18 @@ func main() {
 
 	srv := server.New(":" + port)
 
+	// Make Channel for Error Server
+	serverErr := make(chan error, 1)
+
 	// Start server in goroutine for graceful shutdown
 	go func() {
 		log.Printf("Server running on %s", srv.Addr)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("Server error: %v", err)
+			serverErr <- err
 		}
 	}()
 
 	// Setup graceful shutdown
-	config.GracefulShutdown(srv.Server)
+	config.GracefulShutdown(srv, serverErr)
 	defer database.CloseDB()
 }
