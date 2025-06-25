@@ -1,7 +1,7 @@
 -- name: CreateCategory :one
 INSERT INTO category (name) VALUES ($1) RETURNING *;
 -- name: GetCategory :one
-SELECT * FROM category WHERE id = $1;
+SELECT * FROM category WHERE id = $1 LIMIT 1;
 -- name: ListCategory :many
 SELECT * FROM category;
 -- name: UpdateCategory :one

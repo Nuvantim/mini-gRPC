@@ -30,7 +30,7 @@ func (q *Queries) DeleteCategory(ctx context.Context, id int32) error {
 }
 
 const GetCategory = `-- name: GetCategory :one
-SELECT id, name, created_at FROM category WHERE id = $1
+SELECT id, name, created_at FROM category WHERE id = $1 LIMIT 1
 `
 
 func (q *Queries) GetCategory(ctx context.Context, id int32) (Category, error) {
@@ -41,7 +41,7 @@ func (q *Queries) GetCategory(ctx context.Context, id int32) (Category, error) {
 }
 
 const ListCategory = `-- name: ListCategory :many
-SELECT id, name, created_at FROM category ORDER BY name
+SELECT id, name, created_at FROM category
 `
 
 func (q *Queries) ListCategory(ctx context.Context) ([]Category, error) {

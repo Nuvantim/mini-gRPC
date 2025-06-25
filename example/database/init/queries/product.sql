@@ -1,7 +1,7 @@
 -- name: CreateProduct :one
 INSERT INTO product (name,description,category_id,price) VALUES ($1,$2,$3,$4) RETURNING *;
 -- name: GetProduct :one
-SELECT FROM product WHERE id = $1;
+SELECT * FROM product WHERE id = $1 LIMIT 1;
 -- name: ListProduct :many
 SELECT * FROM product;
 -- name: UpdateProduct :one

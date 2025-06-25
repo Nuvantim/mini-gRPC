@@ -33,17 +33,124 @@ func NewProductService(queries *repository.Queries) *ProductService {
 }
 
 // Create Product
-func (s *ProductService) CreateProduct(ctx context.Context, req *CreateProductRequest)(*CreateProductResponse, error){
-        tx,err := database.DB.Begin(ctx.Background())
-        err != nil {
-                return nil, connect.NewError(connect.CodeNotFound)
-        }
+func (s *ProductService) CreateProduct(ctx context.Context, req *CreateProductRequest) (*CreateProductResponse, error) {
+	// Start Transaction
+	tx, err := database.DB.Begin(context.Background())
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+	// RollBack Transaction
+	defer tx.Rollback(context.Background())
+
+	// Define queries
+	qtx := s.queries.WithTx(tx)
+
+	// input data from message protobuf
+	var data = repository.CreateProductParams{
+		Name:        req.Msg.Name,
+		Description: req.Msg.Description,
+		CategoryID:  req.Msg.CategoryId,
+		Price:       req.Msg.Price,
+	}
+	// execution queries
+	product, err := qtx.CreateProduct(context.Background(), data)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+	// commit data
+	if err := tx.Commit(context.Background()); err != nil {
+		return nil, connect.NewError(connect.CodeInternal, errors.New("Failed Commit Data"))
+	}
+
+	// retur to protobuf message
+	return connect.NewResponse(&pb.CreateProductResponse{
+		Product: helper.ProductToProto(product),
+	}), nil
+
 }
+
 // Get Product
-func (s *ProductService) GetProduct(ctx context.Context, req *GetProductRequest)(*GetProductResponse, error){}
+func (s *ProductService) GetProduct(ctx context.Context, req *GetProductRequest) (*GetProductResponse, error) {
+	// Input id form protobuf message
+	product, err := s.queries.GetProduct(context.Background(), req.Msg.Id)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	if product.ID == 0 {
+		return nil, connect.NewError(connect.CodeNotFound, errors.New("Product Not Found"))
+	}
+	// return to protobuf message
+	return connect.NewResponse(&pb.GetProductResponse{
+		Product: helper.ProductToProto(product),
+	}), nil
+
+}
+
 // ListProduct
-func (s *ProductService) ListProduct(ctx context.Context, req *ListProductRequest)(*ListProductResponse, error){}
+func (s *ProductService) ListProduct(ctx context.Context, req *ListProductRequest) (*ListProductResponse, error) {
+	product, err := s.queries.ListProduct(context.Background())
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	// Population data
+	protoProduct := make([]*pb.Product, len(product))
+	for i, prd := range product {
+		protoProduct[i] = helper.ProductToProto(prd)
+	}
+
+	return connect.NewResponse(&pb.ListProductResponse{
+		Product: protoProduct,
+	}), nil
+}
+
 // UpdateProduct
-func (s *ProductService) UpdateProduct(ctx context.Context, req *UpdateProductRequest)(*UpdateProductResponse, error){}
+func (s *ProductService) UpdateProduct(ctx context.Context, req *UpdateProductRequest) (*UpdateProductResponse, error) {
+	// Start Transaction
+	tx, err := database.DB.Begin(context.Background())
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+	// RollBack Transaction
+	defer tx.Rollback(context.Background())
+
+	// Define queries
+	qtx := s.queries.WithTx(tx)
+
+	// input data from message protobuf
+	var data = repository.UpdateProductParams{
+		ID:          req.Msg.Id,
+		Name:        req.Msg.Name,
+		Description: req.Msg.Description,
+		CategoryID:  req.Msg.CategoryId,
+		Price:       req.Msg.Price,
+	}
+	// execution queries
+	product, err := qtx.UpdateProduct(context.Background(), data)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+	// commit data
+	if err := tx.Commit(context.Background()); err != nil {
+		return nil, connect.NewError(connect.CodeInternal, errors.New("Failed Commit Data"))
+	}
+
+	// retur to protobuf message
+	return connect.NewResponse(&pb.UpdateProductResponse{
+		Product: helper.ProductToProto(product),
+	}), nil
+}
+
 // DeleteProduct
-func (s *ProductService) DeleteProduct(ctx context.Context, req *DeleteProductRequest)(*DeleteProductResponse, error){}
+func (s *ProductService) DeleteProduct(ctx context.Context, req *DeleteProductRequest) (*DeleteProductResponse, error) {
+	// Input id form protobuf message
+	if err := s.queries.DeleteProduct(context.Background(), req.Msg.Id); err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	// return to protobuf message
+	return connect.NewResponse(&pb.DeleteProductResponse{
+		Success: true,
+	}), nil
+}

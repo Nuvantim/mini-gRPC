@@ -8,7 +8,7 @@ import (
 	"example/internal/repository"
 	"example/internal/service"
 	"example/rpc/proto/category/v1/categoryconnect"
-	"example/pb/proto/product/v1/productv1connect"
+	"example/rpc/proto/product/v1/productconnect"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 )
@@ -24,7 +24,7 @@ func New(addr string) *Server {
 
 	// Create services
 	categoryService := service.NewCategoryService(queries)
-        productService := product.NewProductService(queries)
+	productService := service.NewProductService(queries)
 
 	// Setup handlers with logging middleware
 	mux := http.NewServeMux()
