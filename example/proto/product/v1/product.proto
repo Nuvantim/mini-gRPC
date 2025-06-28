@@ -4,6 +4,8 @@ package proto.product.v1;
 
 option go_package="example/pb/proto/product/v1;product";
 
+import "proto/category/v1/category.proto";
+
 message Product {
 	int32 id = 1;
 	string name = 2;
@@ -25,6 +27,10 @@ message CreateProductResponse {
 
 message GetProductRequest {
 	int32 id = 1;
+	string name = 2;
+	string description = 3;
+	int32 price = 4;
+	proto.category.v1.Category category = 5;
 }
 
 message GetProductResponse {

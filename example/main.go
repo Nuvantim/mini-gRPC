@@ -12,27 +12,27 @@ import (
 )
 
 func main() {
-	// Chechk env
-	godotenv.Load()
+	// Load environment variables
+	if err := godotenv.Load(); err != nil {
+		log.Println("Warning: .env file not found")
+	}
+
 	port := os.Getenv("PORT_SERVICE")
 	if port == "" {
-		log.Fatalf("Port Service Not Found")
+		log.Fatal("PORT_SERVICE not set")
 	}
 
 	srv := server.New(":" + port)
 
-	// Make Channel for Error Server
-	serverErr := make(chan error, 1)
-
-	// Start server in goroutine for graceful shutdown
+	// Start server in goroutine
 	go func() {
-		log.Printf("Server running on %s", srv.Addr)
+		log.Printf("Server is running on %s", srv.Addr)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			serverErr <- err
+			log.Fatalf("Server error: %v", err)
 		}
 	}()
 
 	// Setup graceful shutdown
-	config.GracefulShutdown(srv, serverErr)
+	config.GracefulShutdown(srv.Server)
 	defer database.CloseDB()
 }

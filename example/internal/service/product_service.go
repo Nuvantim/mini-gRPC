@@ -72,18 +72,20 @@ func (s *ProductService) CreateProduct(ctx context.Context, req *CreateProductRe
 // Get Product
 func (s *ProductService) GetProduct(ctx context.Context, req *GetProductRequest) (*GetProductResponse, error) {
 	// Input id form protobuf message
-	product, err := s.queries.GetProduct(context.Background(), req.Msg.Id)
-	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
-	}
+	// product, err := s.queries.GetProduct(context.Background(), req.Msg.Id)
+	// if err != nil {
+	// 	return nil, connect.NewError(connect.CodeInternal, err)
+	// }
 
-	if product.ID == 0 {
-		return nil, connect.NewError(connect.CodeNotFound, errors.New("Product Not Found"))
-	}
-	// return to protobuf message
-	return connect.NewResponse(&pb.GetProductResponse{
-		Product: helper.ProductToProto(product),
-	}), nil
+	// if product.ID == 0 {
+	// 	return nil, connect.NewError(connect.CodeNotFound, errors.New("Product Not Found"))
+	// }
+	// // return to protobuf message
+	// return connect.NewResponse(&pb.GetProductResponse{
+	// 	Product: helper.ProductToProto(product),
+	// }), nil
+
+	return nil,nil
 
 }
 

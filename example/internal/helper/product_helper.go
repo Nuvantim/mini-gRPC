@@ -14,3 +14,14 @@ func ProductToProto(c repo.Product) *pb.Product {
 		Price:       c.Price,
 	}
 }
+
+func JoinToProto(c repo.Product) *pb.Product {
+	return &pb.Product{
+		Id:          c.ID,
+		Name:        c.Name,
+		Description: c.Description,
+		Price:       c.Price,
+		Category: &CategoryToProto{c.Category}
+		
+	}
+}
