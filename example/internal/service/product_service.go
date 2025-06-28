@@ -7,6 +7,7 @@ import (
 	"example/internal/helper"
 	"example/internal/repository"
 
+	"log"
 	"errors"
 	pb "example/pb/proto/product/v1"
 )
@@ -61,31 +62,32 @@ func (s *ProductService) CreateProduct(ctx context.Context, req *CreateProductRe
 	if err := tx.Commit(context.Background()); err != nil {
 		return nil, connect.NewError(connect.CodeInternal, errors.New("Failed Commit Data"))
 	}
+	log.Println(product)
 
-	// retur to protobuf message
-	return connect.NewResponse(&pb.CreateProductResponse{
-		Product: helper.ProductToProto(product),
-	}), nil
+	return nil,nil
+	// return to protobuf message
+	// return connect.NewResponse(&pb.CreateProductResponse{
+	// 	Product: helper.ProductToProto(product),
+	// }), nil
 
 }
 
 // Get Product
 func (s *ProductService) GetProduct(ctx context.Context, req *GetProductRequest) (*GetProductResponse, error) {
 	// Input id form protobuf message
-	// product, err := s.queries.GetProduct(context.Background(), req.Msg.Id)
-	// if err != nil {
-	// 	return nil, connect.NewError(connect.CodeInternal, err)
-	// }
+	product, err := s.queries.GetProduct(context.Background(), req.Msg.Id)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
 
-	// if product.ID == 0 {
-	// 	return nil, connect.NewError(connect.CodeNotFound, errors.New("Product Not Found"))
-	// }
-	// // return to protobuf message
-	// return connect.NewResponse(&pb.GetProductResponse{
-	// 	Product: helper.ProductToProto(product),
-	// }), nil
+	if product.Product.ID == 0 {
+		return nil, connect.NewError(connect.CodeNotFound, errors.New("Product Not Found"))
+	}
 
-	return nil,nil
+	// return to protobuf message
+	return connect.NewResponse(&pb.GetProductResponse{
+		Product: helper.JoinToProto(product),
+	}), nil
 
 }
 
@@ -101,10 +103,11 @@ func (s *ProductService) ListProduct(ctx context.Context, req *ListProductReques
 	for i, prd := range product {
 		protoProduct[i] = helper.ProductToProto(prd)
 	}
-
-	return connect.NewResponse(&pb.ListProductResponse{
-		Product: protoProduct,
-	}), nil
+	log.Println(product)
+	return nil,nil
+	// return connect.NewResponse(&pb.ListProductResponse{
+	// 	Product: protoProduct,
+	// }), nil
 }
 
 // UpdateProduct
@@ -137,11 +140,13 @@ func (s *ProductService) UpdateProduct(ctx context.Context, req *UpdateProductRe
 	if err := tx.Commit(context.Background()); err != nil {
 		return nil, connect.NewError(connect.CodeInternal, errors.New("Failed Commit Data"))
 	}
+	log.Println(product)
+	return nil,nil
 
 	// retur to protobuf message
-	return connect.NewResponse(&pb.UpdateProductResponse{
-		Product: helper.ProductToProto(product),
-	}), nil
+	// return connect.NewResponse(&pb.UpdateProductResponse{
+	// 	Product: helper.ProductToProto(product),
+	// }), nil
 }
 
 // DeleteProduct

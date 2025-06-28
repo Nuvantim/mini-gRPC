@@ -2,10 +2,9 @@
 INSERT INTO product (name,description,category_id,price) VALUES ($1,$2,$3,$4) RETURNING *;
 
 -- name: GetProduct :one
-SELECT p.id, p.name, p.description, p.price,
-c1.id AS "categoryID", c1.name AS "categoryName"
-FROM "public".product p 
-INNER JOIN "public".category c1 ON ( c1.id = p.category_id  ) WHERE p.id = $1 LIMIT 1;
+SELECT sqlc.embed(product), sqlc.embed(category)
+FROM "public".product
+INNER JOIN "public".category ON ( category.id = product.category_id  ) WHERE product.id = $1 LIMIT 1;
 
 -- name: ListProduct :many
 SELECT * FROM product;

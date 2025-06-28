@@ -12,6 +12,7 @@ message Product {
 	string description = 3;
 	int32 category_id = 4;
 	int32 price = 5;
+	proto.category.v1.Category category = 6;
 }
 
 message CreateProductRequest {
@@ -22,7 +23,7 @@ message CreateProductRequest {
 }
 
 message CreateProductResponse {
-	Product product = 1;
+	repeated Product product = 1;
 }
 
 message GetProductRequest {
@@ -30,11 +31,7 @@ message GetProductRequest {
 }
 
 message GetProductResponse {
-	int32 id = 1;
-	string name = 2;
-	string description = 3;
-	int32 price = 4;
-	proto.category.v1.Category category = 5;
+	repeated Product product = 1;
 }
 
 message ListProductRequest {}
