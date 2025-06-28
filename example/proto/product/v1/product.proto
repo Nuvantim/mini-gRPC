@@ -27,14 +27,14 @@ message CreateProductResponse {
 
 message GetProductRequest {
 	int32 id = 1;
+}
+
+message GetProductResponse {
+	int32 id = 1;
 	string name = 2;
 	string description = 3;
 	int32 price = 4;
 	proto.category.v1.Category category = 5;
-}
-
-message GetProductResponse {
-	Product product = 1;
 }
 
 message ListProductRequest {}
@@ -45,7 +45,7 @@ message ListProductResponse {
 
 message UpdateProductRequest {
 	int32 id = 1;
-    string name = 2;
+        string name = 2;
 	string description = 3;
 	int32 category_id = 4;
 	int32 price = 5;
