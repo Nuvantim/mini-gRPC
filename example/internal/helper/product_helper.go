@@ -15,13 +15,15 @@ func ProductToProto(c repo.Product) *pb.Product {
 	}
 }
 
-func JoinToProto(p repo.GetProductRow) *[]pb.Product {
-	return &[]pb.Product {
-		Id:          p.Product.ID,
-		Name:        p.Product.Name,
-		Description: p.Product.Description,
-		Price:       p.Product.Price,
-		CategoryId:  p.Product.CategoryID,
-		Category: CategoryToProto(p.Category),
-	}
+func JoinToProto(p repo.GetProductRow) []*pb.Product {
+    return []*pb.Product{
+        {
+            Id:          p.Product.ID,
+            Name:        p.Product.Name,
+            Description: p.Product.Description,
+            Price:       p.Product.Price,
+            CategoryId:  p.Product.CategoryID,
+            Category:    CategoryToProto(p.Category),
+        },
+    }
 }
