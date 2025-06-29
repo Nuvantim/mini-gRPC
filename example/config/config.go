@@ -22,7 +22,7 @@ func GracefulShutdown(srv *http.Server) {
 
 	// Gunakan context dengan timeout untuk memberi waktu server shutdown
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()  // Pastikan cancel selalu dipanggil untuk membersihkan resource context
+	defer cancel() // Pastikan cancel selalu dipanggil untuk membersihkan resource context
 
 	// Matikan server dengan graceful shutdown
 	if err := srv.Shutdown(ctx); err != nil {
@@ -34,7 +34,6 @@ func GracefulShutdown(srv *http.Server) {
 	// Setelah server shutdown, kita bisa menutup channel quit
 	close(quit)
 }
-
 
 // LogRequest logs HTTP requests
 func LogRequest(next http.Handler) http.Handler {

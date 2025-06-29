@@ -7,7 +7,9 @@ FROM "public".product
 INNER JOIN "public".category ON ( category.id = product.category_id  ) WHERE product.id = $1 LIMIT 1;
 
 -- name: ListProduct :many
-SELECT * FROM product;
+SELECT sqlc.embed(product), sqlc.embed(category)
+FROM "public".product
+INNER JOIN "public".category ON (category.id = product.category_id);
 
 -- name: UpdateProduct :one
 UPDATE product SET name=$2, description=$3, category_id=$4, price=$5 WHERE id = $1 RETURNING *;
