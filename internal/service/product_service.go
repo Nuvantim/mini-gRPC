@@ -95,9 +95,10 @@ func (s *ProductService) ListProduct(ctx context.Context, req *ListProductReques
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	var protoProducts []*pb.Products
+
+	var protoProducts []*pb.ProductWithCategory
 	for _, prd := range products {
-		protoProducts = helper.ListToProto(prd)
+		protoProducts = append(protoProducts,helper.ListToProto(prd)...)
 	}
 
 	return connect.NewResponse(&pb.ListProductResponse{

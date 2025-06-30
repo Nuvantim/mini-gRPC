@@ -15,6 +15,17 @@ message Product {
 	int32 price = 5;
 }
 
+// object
+message ProductWithCategory {
+	int32 id = 1;
+	string name = 2;
+	string description = 3;
+	int32 category_id = 4;
+	int32 price = 5;
+	proto.category.v1.Category category = 6;
+}
+
+// Create
 message CreateProductRequest {
 	string name = 1;
 	string description = 2;
@@ -26,6 +37,23 @@ message CreateProductResponse {
 	Product product = 1;
 }
 
+// Get
+message GetProductRequest {
+	int32 id = 1;
+}
+
+message GetProductResponse {
+	repeated ProductWithCategory products = 1;
+}
+
+// List
+message ListProductRequest {}
+
+message ListProductResponse {
+	repeated ProductWithCategory products = 1;
+}
+
+// Update
 message UpdateProductRequest {
 	int32 id = 1;
     string name = 2;
@@ -38,30 +66,7 @@ message UpdateProductResponse {
     Product product = 1;
 }
 
-// Object
-message Products {
-	int32 id = 1;
-	string name = 2;
-	string description = 3;
-	int32 category_id = 4;
-	int32 price = 5;
-	proto.category.v1.Category category = 6;
-}
-
-message GetProductRequest {
-	int32 id = 1;
-}
-
-message GetProductResponse {
-	repeated Products products = 1;
-}
-
-message ListProductRequest {}
-
-message ListProductResponse {
-	repeated Products products = 1;
-}
-
+// Delete
 message DeleteProductRequest {
     int32 id = 1;
 }
@@ -72,8 +77,8 @@ message DeleteProductResponse {
 
 service ProductService {
     rpc CreateProduct(CreateProductRequest) returns (CreateProductResponse);
-    rpc UpdateProduct(UpdateProductRequest) returns (UpdateProductResponse);
     rpc GetProduct(GetProductRequest) returns (GetProductResponse);
     rpc ListProduct(ListProductRequest) returns (ListProductResponse);
+    rpc UpdateProduct(UpdateProductRequest) returns (UpdateProductResponse);
     rpc DeleteProduct(DeleteProductRequest) returns (DeleteProductResponse);
 }
