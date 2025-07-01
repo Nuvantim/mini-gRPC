@@ -17,5 +17,3 @@ UPDATE product SET name=$2, description=$3, category_id=$4, price=$5 WHERE id = 
 -- name: DeleteProduct :exec
 DELETE FROM product WHERE id = $1;
 
-
--- SELECT * FROM product WHERE id = $1 LIMIT 1;
