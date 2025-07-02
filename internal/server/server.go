@@ -3,14 +3,16 @@ package server
 import (
 	"net/http"
 
-	"example/middleware"
 	"example/database"
 	"example/internal/repository"
 	"example/internal/service"
+	"example/middleware"
 	"example/rpc/proto/category/v1/categoryconnect"
 	"example/rpc/proto/product/v1/productconnect"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
+	"time"
+	"golang.org/x/time/rate"
 )
 
 type Server struct {
@@ -28,11 +30,17 @@ func New(addr string) *Server {
 	mux.Handle(categoryconnect.NewCategoryServiceHandler(categoryService))
 	mux.Handle(productconnect.NewProductServiceHandler(productService))
 
+	rateLimiterConfig := middleware.RateLimiterConfig{
+		Rate:      rate.Every(time.Minute / 100), 			// 100 requests per minute
+		Burst:     30,                                      // Allow short bursts
+		PerClient: true,                                    // Limit per client IP
+		LRUCacheSize: 2000,
+	}
 
 	// Build middleware chain
 	middlewareChain := middleware.Chain(
 		middleware.CORS(),
-		// middleware.CSRF(),
+		middleware.RateLimiter(rateLimiterConfig),
 		middleware.Logging(),
 	)
 

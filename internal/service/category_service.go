@@ -101,10 +101,12 @@ func (s *CategoryService) UpdateCategory(ctx context.Context, req *UpdateCategor
 
 	qtx := s.queries.WithTx(tx)
 
-	category, err := qtx.UpdateCategory(context.Background(), repository.UpdateCategoryParams{
+	data := repository.UpdateCategoryParams{
 		ID:   req.Msg.Id,
 		Name: req.Msg.Name,
-	})
+	}
+
+	category, err := qtx.UpdateCategory(context.Background(), data)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}

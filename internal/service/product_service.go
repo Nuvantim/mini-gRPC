@@ -34,6 +34,12 @@ func NewProductService(queries *repository.Queries) *ProductService {
 
 // Create Product
 func (s *ProductService) CreateProduct(ctx context.Context, req *CreateProductRequest) (*CreateProductResponse, error) {
+	// Search Category
+	category, _ := s.queries.CountCategory(context.Background(), req.Msg.CategoryId)
+
+	if category == 0 {
+		return nil, connect.NewError(connect.CodeNotFound, errors.New("Category Not Found"))
+	}
 	// Start Transaction
 	tx, err := database.DB.Begin(context.Background())
 	if err != nil {
@@ -95,10 +101,9 @@ func (s *ProductService) ListProduct(ctx context.Context, req *ListProductReques
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-
 	var protoProducts []*pb.ProductWithCategory
 	for _, prd := range products {
-		protoProducts = append(protoProducts,helper.ListToProto(prd)...)
+		protoProducts = append(protoProducts, helper.ListToProto(prd)...)
 	}
 
 	return connect.NewResponse(&pb.ListProductResponse{

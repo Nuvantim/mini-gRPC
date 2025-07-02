@@ -5,7 +5,6 @@ import (
 	pb "example/pb/proto/product/v1"
 )
 
-
 func ProductToProto(c repo.Product) *pb.Product {
 	return &pb.Product{
 		Id:          c.ID,
@@ -15,7 +14,6 @@ func ProductToProto(c repo.Product) *pb.Product {
 		Price:       c.Price,
 	}
 }
-
 
 func ProductsToProto(p repo.GetProductRow) []*pb.ProductWithCategory {
 	return []*pb.ProductWithCategory{
