@@ -15,7 +15,6 @@ func Logging() Middleware {
 					"%s %s %s %v",
 					r.Method,
 					r.RequestURI,
-					r.RemoteAddr,
 					time.Since(start),
 				)
 			}()
