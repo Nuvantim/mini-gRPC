@@ -25,7 +25,8 @@ WORKDIR /source
 COPY . .
 
 # Initialize Go modules and build the project
-RUN go mod tidy && make build
+RUN go mod tidy
+RUN GOMEMLIMIT=300000000 make build
 
 # Prepare .env file for running in /app
 RUN mv .env.prod .env && \
