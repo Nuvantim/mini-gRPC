@@ -3,35 +3,35 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: my-app
+    image: my-rpc
     pull_policy: never
-    container_name: myapp
+    container_name: myrpc
     restart: always
     ports:
-      - "7373:7373"
+      - "6363:6363"
     volumes:
       - ./logs:/app/logs
     depends_on:
       - db
     networks:
-      - kalveir-network
+      - microservice-network
   db:
     image: postgres:16-alpine3.20
-    container_name: mydb
+    container_name: mydata
     restart: always
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: SuperPassword123
-      POSTGRES_DB: api_store
+      POSTGRES_PASSWORD: admin345
+      POSTGRES_DB: example
     ports:
-      - "5432:5432"
+      - "5435:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
     networks:
-      - kalveir-network
+      - microservice-network
 
 volumes:
   postgres-data:
 networks:
-  kalveir-network:
+  microservice-network:
     driver: bridge
