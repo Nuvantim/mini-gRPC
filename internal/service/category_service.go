@@ -111,6 +111,10 @@ func (s *CategoryService) UpdateCategory(ctx context.Context, req *UpdateCategor
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
+	if err := tx.Commit(context.Background()); err != nil {
+		return nil, connect.NewError(connect.CodeNotFound, errors.New("Failed to start transaction"))
+	}
+
 	return connect.NewResponse(&pb.UpdateCategoryResponse{
 		Category: helper.CategoryToProto(category),
 	}), nil
