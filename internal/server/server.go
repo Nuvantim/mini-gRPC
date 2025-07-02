@@ -31,7 +31,7 @@ func New(addr string) *Server {
 	mux.Handle(productconnect.NewProductServiceHandler(productService))
 
 	rateLimiterConfig := middleware.RateLimiterConfig{
-		Rate:      rate.Every(time.Minute / 100), 			// 100 requests per minute
+		Rate:      rate.Every(time.Minute / 40), 			// 100 requests per minute
 		Burst:     30,                                      // Allow short bursts
 		PerClient: true,                                    // Limit per client IP
 		LRUCacheSize: 2000,
