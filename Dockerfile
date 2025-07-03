@@ -10,11 +10,11 @@ WORKDIR /source
 COPY . .
 
 # Prepare .env file for running in /app
-RUN mv .env.prod .env && \
+RUN mv env.prod .env && \
     mv .env /app
 
 # Move the built binary to the final directory
-RUN mv ./bin/api /app/bin
+RUN mv /source/bin /app
 
 # Set working directory to /app and run the application
 WORKDIR /app
