@@ -17,7 +17,7 @@ func Logging() Middleware {
 				endpoint := path.Base(r.RequestURI)
 
 				log.Printf(
-					"%s %s %s %v | Client IP: %s | User-Agent: %s",
+					"%s %s %v | Client IP: %s | User-Agent: %s",
 					r.Method,
 					endpoint,
 					time.Since(start),
