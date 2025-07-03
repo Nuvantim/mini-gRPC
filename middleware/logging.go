@@ -7,8 +7,6 @@ import (
 	"time"
 )
 
-type Middleware func(http.Handler) http.Handler
-
 func Logging() Middleware {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
