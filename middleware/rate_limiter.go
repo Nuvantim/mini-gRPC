@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"fmt"
+	"log"
 	"net"
 	"net/http"
 
@@ -42,9 +42,9 @@ func RateLimiter(config RateLimiterConfig) func(next http.Handler) http.Handler 
 		clientLimitersCache, err = lru.New[string, *rate.Limiter](config.LRUCacheSize)
 		if err != nil {
 			// Ini adalah error fatal saat inisialisasi middleware
-			panic(fmt.Sprintf("ERROR: Gagal membuat LRU cache: %v", err))
+			panic(log.printf("ERROR: Gagal membuat LRU cache: %v", err))
 		}
-		fmt.Printf("LRU Cache Size: %d\n", config.LRUCacheSize)
+		log.Printf("LRU Cache Size: %d\n", config.LRUCacheSize)
 	}
 
 	return func(next http.Handler) http.Handler {
