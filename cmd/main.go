@@ -12,17 +12,15 @@ import (
 )
 
 func main() {
-	// Load environment variables
-	if err := godotenv.Load(); err != nil {
-		log.Println("Warning: .env file not found")
+	env, err := cofig.CheckEnv()
+	if err != nil {
+		log.Fatal(err)
 	}
+	log.Println(env)
 
-	port := os.Getenv("PORT_SERVICE")
-	if port == "" {
-		log.Fatal("PORT_SERVICE not set")
-	}
+	serv := config.ServerEnvirontment()
 
-	srv := server.New(":" + port)
+	srv := server.New(":"+serv.port, serv.rate, serv.burst, serv.lru)
 
 	// Start server in goroutine
 	go func() {

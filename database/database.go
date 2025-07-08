@@ -3,9 +3,9 @@ package database
 import (
 	"context"
 	"log"
-	"os"
 	"sync"
 
+	"example/config"
 	"example/internal/repository"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
@@ -18,18 +18,10 @@ var (
 )
 
 func InitDB() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
 	once.Do(func() {
-		host := os.Getenv("DB_HOST")
-		user := os.Getenv("DB_USER")
-		password := os.Getenv("DB_PASSWORD")
-		port := os.Getenv("DB_PORT")
-		db_name := os.Getenv("DB_NAME")
+		dbconfig := config.DatabaseEnvirontment()
 		var err error
-		var dsn string = "postgres://" + user + ":" + password + "@" + host + ":" + port + "/" + db_name
+		var dsn string = "postgres://" + dbconfig.user + ":" + dbconfig.password + "@" + dbconfig.host + ":" + dbconfig.port + "/" + dbconfig.name
 		DB, err = pgxpool.New(context.Background(), dsn)
 		if err != nil {
 			log.Fatalf("Unable to create connection pool: %v", err)

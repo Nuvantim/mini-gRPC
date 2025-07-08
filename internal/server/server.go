@@ -11,15 +11,15 @@ import (
 	"example/rpc/proto/product/v1/productconnect"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
-	"time"
 	"golang.org/x/time/rate"
+	"time"
 )
 
 type Server struct {
 	*http.Server
 }
 
-func New(addr string) *Server {
+func New(addr string, rate, burst, lru uint) *Server {
 	database.InitDB()
 	queries := repository.New(database.DB)
 
@@ -31,10 +31,10 @@ func New(addr string) *Server {
 	mux.Handle(productconnect.NewProductServiceHandler(productService))
 
 	rateLimiterConfig := middleware.RateLimiterConfig{
-		Rate:      rate.Every(time.Minute / 100), 			// 100 requests per minute
-		Burst:     30,                                      // Allow short bursts
-		PerClient: true,                                    // Limit per client IP
-		LRUCacheSize: 2000,
+		Rate:         rate.Every(time.Minute / 100), // 100 requests per minute
+		Burst:        30,                          // Allow short bursts
+		PerClient:    true,                           // Limit per client IP
+		LRUCacheSize: 200,
 	}
 
 	// Build middleware chain
