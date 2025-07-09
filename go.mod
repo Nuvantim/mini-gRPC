@@ -8,11 +8,11 @@ require (
 	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/jackc/pgx/v5 v5.7.5
 	github.com/joho/godotenv v1.5.1
+	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/rs/cors v1.11.1
 	golang.org/x/net v0.41.0
 	golang.org/x/time v0.12.0
 	google.golang.org/protobuf v1.34.2
-        github.com/kelseyhightower/envconfig
 )
 
 require (

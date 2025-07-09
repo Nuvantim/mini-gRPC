@@ -17,19 +17,19 @@ type DatabaseConfig struct {
 
 type ServerConfig struct {
 	Port  string `envconfig:"PORT_SERVICE"`
-	Rate  uint   `envconfig:"RATE"`
-	Burst uint   `envconfig:"BURST"`
-	LRU   uint   `envconfig:"LRU"`
+	Rate  int    `envconfig:"RATE"`
+	Burst int    `envconfig:"BURST"`
+	LRU   int    `envconfig:"LRU"`
 }
 
 func CheckEnv() (string, error) {
 	if err := godotenv.Load(); err != nil {
-		return "", errors.New("failed to load configuration file: " + err.Error())
+		return "", errors.New("Failed to load configuration file: " + err.Error())
 	}
 	return "Running Configuration..", nil
 }
 
-func LoadDatabaseConfig() (*DatabaseConfig, error) {
+func GetDatabaseConfig() (*DatabaseConfig, error) {
 	var cfg DatabaseConfig
 	if err := envconfig.Process("", &cfg); err != nil {
 		return nil, err
@@ -37,11 +37,10 @@ func LoadDatabaseConfig() (*DatabaseConfig, error) {
 	return &cfg, nil
 }
 
-func LoadServerConfig() (*ServerConfig, error) {
+func GetServerConfig() (*ServerConfig, error) {
 	var cfg ServerConfig
 	if err := envconfig.Process("", &cfg); err != nil {
 		return nil, err
 	}
 	return &cfg, nil
 }
-

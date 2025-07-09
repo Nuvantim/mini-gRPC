@@ -11,9 +11,9 @@ import (
 
 // RateLimiterConfig holds configuration for the rate limiter.
 type RateLimiterConfig struct {
-	Rate rate.Limit
-	Burst int
-	PerClient bool
+	Rate         rate.Limit
+	Burst        int
+	PerClient    bool
 	LRUCacheSize int
 }
 
@@ -35,7 +35,7 @@ func RateLimiter(config RateLimiterConfig) func(next http.Handler) http.Handler 
 	} else {
 		if config.LRUCacheSize <= 0 {
 			// Atur ukuran default jika tidak valid
-			config.LRUCacheSize = 1000 
+			config.LRUCacheSize = 1000
 		}
 		var err error
 		// Buat cache LRU baru. Anda bisa menambahkan OnEvict untuk melihat apa yang dihapus.
@@ -53,7 +53,7 @@ func RateLimiter(config RateLimiterConfig) func(next http.Handler) http.Handler 
 
 			if config.PerClient {
 				ip := getClientIP(r)
-				
+
 				// Coba dapatkan limiter dari cache
 				if val, ok := clientLimitersCache.Get(ip); ok {
 					limiter = val

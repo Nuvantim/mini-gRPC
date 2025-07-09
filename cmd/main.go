@@ -1,28 +1,24 @@
 package main
 
 import (
+	"log"
+	"net/http"
+
 	"example/config"
 	"example/database"
 	"example/internal/server"
-	"log"
-	"net/http"
-	"os"
-
-	"github.com/joho/godotenv"
 )
 
 func main() {
-	// Load environment variables
-	if err := godotenv.Load(); err != nil {
-		log.Println("Warning: .env file not found")
+	// Check Environtment
+	conf, err := config.CheckEnv()
+	if err != nil {
+		log.Fatal(err)
 	}
+	log.Printf(conf)
 
-	port := os.Getenv("PORT_SERVICE")
-	if port == "" {
-		log.Fatal("PORT_SERVICE not set")
-	}
-
-	srv := server.New(":" + port)
+	// Start Server
+	srv := server.New()
 
 	// Start server in goroutine
 	go func() {
