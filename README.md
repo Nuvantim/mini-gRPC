@@ -1,6 +1,6 @@
-# 🧩 miniGRPC
+# 🧩 mini-gRPC
 
-**miniGRPC** is a lightweight gRPC-based backend service designed to manage **Product** and **Category** data.
+**mini-gRPC** is a lightweight gRPC-based backend service designed to manage **Product** and **Category** data.
 
 ---
 
