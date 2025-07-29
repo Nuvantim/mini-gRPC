@@ -1,5 +1,9 @@
 # 🧩 mini-gRPC
 
+<a href="https://ibb.co/vt7fFyZ">
+  <img src="https://i.ibb.co/LGLBFjn/IMG-20250729-145240.png" alt="IMG-20250729-145240" border="0">
+</a>
+
 **mini-gRPC** is a lightweight gRPC-based backend service designed to manage **Product** and **Category** data.
 
 ---
