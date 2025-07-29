@@ -86,15 +86,11 @@ go run cmd/main.go
 ```bash
 make build
 ```
-### 2. Set Production Environtment
-```bash
-mv env.prod .env
-```
-### 3. Run Docker Compose
+### 2. Run Docker Compose
 ```bash
 docker compose up -d
 ```
-### 4. Check Docker logs
+### 3. Check Docker logs
 ```bash
 docker logs myrpc
 ```
