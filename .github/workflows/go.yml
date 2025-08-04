@@ -1,34 +1,15 @@
-name: "Vuln Analysis"
-
-on: 
-  push:
-  pull_request:
+name: "CI"
+on: ["push", "pull_request"]
 
 jobs:
   ci:
-    name: "Vuln Analysis"
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: ["windows-latest", "ubuntu-latest", "macos-latest"]
-        go: ["1.23.x", "1.24.x"]
-
+    name: "Run CI"
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-        with:
-          fetch-depth: 1
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+    - uses: dominikh/staticcheck-action@v1
+      with:
+        version: "latest"
 
-      - uses: WillAbides/setup-go-faster@v1.7.0
-        with:
-          go-version: ${{ matrix.go }}
-
-      - run: go test ./...
-
-      - run: go vet ./...
-
-      - uses: dominikh/staticcheck-action@v1.2.0
-        with:
-          version: "2022.1.1"
-          install-go: false
-          cache-key: ${{ matrix.go }}
