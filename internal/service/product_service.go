@@ -3,7 +3,6 @@ package service
 import (
 	"connectrpc.com/connect"
 	"context"
-	"example/database"
 	"example/internal/helper"
 	"example/internal/repository"
 
@@ -40,17 +39,6 @@ func (s *ProductService) CreateProduct(ctx context.Context, req *CreateProductRe
 	if category == 0 {
 		return nil, connect.NewError(connect.CodeNotFound, errors.New("Category Not Found"))
 	}
-	// Start Transaction
-	tx, err := database.DB.Begin(context.Background())
-	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
-	}
-	// RollBack Transaction
-	defer tx.Rollback(context.Background())
-
-	// Define queries
-	qtx := s.queries.WithTx(tx)
-
 	// input data from message protobuf
 	var data = repository.CreateProductParams{
 		Name:        req.Msg.Name,
@@ -59,13 +47,9 @@ func (s *ProductService) CreateProduct(ctx context.Context, req *CreateProductRe
 		Price:       req.Msg.Price,
 	}
 	// execution queries
-	product, err := qtx.CreateProduct(context.Background(), data)
+	product, err := s.queries.CreateProduct(context.Background(), data)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, err)
-	}
-	// commit data
-	if err := tx.Commit(context.Background()); err != nil {
-		return nil, connect.NewError(connect.CodeInternal, errors.New("Failed Commit Data"))
 	}
 
 	// return to protobuf message
@@ -113,17 +97,6 @@ func (s *ProductService) ListProduct(ctx context.Context, req *ListProductReques
 
 // UpdateProduct
 func (s *ProductService) UpdateProduct(ctx context.Context, req *UpdateProductRequest) (*UpdateProductResponse, error) {
-	// Start Transaction
-	tx, err := database.DB.Begin(context.Background())
-	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
-	}
-	// RollBack Transaction
-	defer tx.Rollback(context.Background())
-
-	// Define queries
-	qtx := s.queries.WithTx(tx)
-
 	// input data from message protobuf
 	var data = repository.UpdateProductParams{
 		ID:          req.Msg.Id,
@@ -133,13 +106,9 @@ func (s *ProductService) UpdateProduct(ctx context.Context, req *UpdateProductRe
 		Price:       req.Msg.Price,
 	}
 	// execution queries
-	product, err := qtx.UpdateProduct(context.Background(), data)
+	product, err := s.queries.UpdateProduct(context.Background(), data)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, err)
-	}
-	// commit data
-	if err := tx.Commit(context.Background()); err != nil {
-		return nil, connect.NewError(connect.CodeInternal, errors.New("Failed Commit Data"))
 	}
 
 	// return to protobuf message

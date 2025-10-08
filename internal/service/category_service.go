@@ -3,7 +3,6 @@ package service
 import (
 	"connectrpc.com/connect"
 	"context"
-	"example/database"
 	"example/internal/helper"
 	"example/internal/repository"
 
@@ -34,22 +33,10 @@ func NewCategoryService(queries *repository.Queries) *CategoryService {
 
 // Create Category
 func (s *CategoryService) CreateCategory(ctx context.Context, req *CreateCategoryRequest) (*CreateCategoryResponse, error) {
-	tx, err := database.DB.Begin(context.Background())
-	if err != nil {
-		return nil, connect.NewError(connect.CodeNotFound, errors.New("Failed to start transaction"))
-	}
-	defer tx.Rollback(context.Background())
-	qtx := s.queries.WithTx(tx)
-
-	category, err := qtx.CreateCategory(context.Background(), req.Msg.Name)
+	category, err := s.queries.CreateCategory(context.Background(), req.Msg.Name)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
-
-	if err := tx.Commit(context.Background()); err != nil {
-		return nil, connect.NewError(connect.CodeNotFound, errors.New("Failed to start transaction"))
-	}
-
 	return connect.NewResponse(&pb.CreateCategoryResponse{
 		Category: helper.CategoryToProto(category),
 	}), nil
@@ -60,9 +47,6 @@ func (s *CategoryService) GetCategory(ctx context.Context, req *GetCategoryReque
 	category, err := s.queries.GetCategory(context.Background(), req.Msg.Id)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, err)
-	}
-	if category.ID == 0 {
-		return nil, connect.NewError(connect.CodeNotFound, errors.New("category not found"))
 	}
 
 	return connect.NewResponse(&pb.GetCategoryResponse{
@@ -92,27 +76,14 @@ func (s *CategoryService) UpdateCategory(ctx context.Context, req *UpdateCategor
 	if req.Msg.Name == "" {
 		return nil, connect.NewError(connect.CodeNotFound, errors.New("Name is Required"))
 	}
-	// transaction
-	tx, err := database.DB.Begin(context.Background())
-	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, errors.New("Failed data transaction"))
-	}
-	defer tx.Rollback(context.Background())
-
-	qtx := s.queries.WithTx(tx)
-
 	data := repository.UpdateCategoryParams{
 		ID:   req.Msg.Id,
 		Name: req.Msg.Name,
 	}
 
-	category, err := qtx.UpdateCategory(context.Background(), data)
+	category, err := s.queries.UpdateCategory(context.Background(), data)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, err)
-	}
-
-	if err := tx.Commit(context.Background()); err != nil {
-		return nil, connect.NewError(connect.CodeNotFound, errors.New("Failed to start transaction"))
 	}
 
 	return connect.NewResponse(&pb.UpdateCategoryResponse{
@@ -122,21 +93,7 @@ func (s *CategoryService) UpdateCategory(ctx context.Context, req *UpdateCategor
 
 // Delete Category
 func (s *CategoryService) DeleteCategory(ctx context.Context, req *DeleteCategoryRequest) (*DeleteCategoryResponse, error) {
-	// Start transaction
-	tx, err := database.DB.Begin(context.Background())
-	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
-	}
-	defer tx.Rollback(context.Background())
-
-	qtx := s.queries.WithTx(tx)
-
-	err = qtx.DeleteCategory(context.Background(), req.Msg.Id)
-	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
-	}
-
-	if err := tx.Commit(context.Background()); err != nil {
+	if err := s.queries.DeleteCategory(context.Background(), req.Msg.Id); err != nil {
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 

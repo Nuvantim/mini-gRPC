@@ -7,6 +7,10 @@ import (
 	"github.com/kelseyhightower/envconfig"
 )
 
+type AppConfig struct {
+	AppName string `envconfig:"APP_NAME"`
+}
+
 type DatabaseConfig struct {
 	Host     string `envconfig:"DB_HOST"`
 	Port     string `envconfig:"DB_PORT"`
@@ -20,6 +24,14 @@ type ServerConfig struct {
 	Rate  int    `envconfig:"RATE"`
 	Burst int    `envconfig:"BURST"`
 	LRU   int    `envconfig:"LRU"`
+}
+
+func GetAppConfig() (*AppConfig, error) {
+	var cfg AppConfig
+	if err := envconfig.Process("", &cfg); err != nil {
+		return nil, err
+	}
+	return &cfg, nil
 }
 
 func CheckEnv() (string, error) {

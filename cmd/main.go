@@ -20,6 +20,8 @@ func main() {
 	// Start Server
 	srv := server.New()
 
+	// print Banner
+	config.Banner()
 	// Start server in goroutine
 	go func() {
 		log.Printf("Server is running on %s", srv.Addr)
