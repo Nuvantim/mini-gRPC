@@ -15,7 +15,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Printf(conf)
 
 	// Start Server
 	srv := server.New()
