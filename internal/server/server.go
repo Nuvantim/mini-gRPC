@@ -64,6 +64,7 @@ func New() *Server {
 		Server: &http.Server{
 			Addr:    ":" + serv.Port,
 			Handler: h2cHandler,
+                        ReadHeaderTimeout: 5 * time.Second,
 		},
 	}
 }

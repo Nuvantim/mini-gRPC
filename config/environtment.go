@@ -34,11 +34,11 @@ func GetAppConfig() (*AppConfig, error) {
 	return &cfg, nil
 }
 
-func CheckEnv() (string, error) {
+func CheckEnv() error {
 	if err := godotenv.Load(); err != nil {
-		return "", errors.New("Failed to load configuration file: " + err.Error())
+		return errors.New("Failed to load configuration file: " + err.Error())
 	}
-	return "Running Configuration..", nil
+	return nil
 }
 
 func GetDatabaseConfig() (*DatabaseConfig, error) {

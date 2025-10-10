@@ -11,10 +11,10 @@ import (
 
 func main() {
 	// Check Environtment
-	conf, err := config.CheckEnv()
-	if err != nil {
-		log.Fatal(err)
+	if err := config.CheckEnv();err != nil {
+                log.Fatal(err)
 	}
+        log.Println("Configuration detetected.....")
 
 	// Start Server
 	srv := server.New()

@@ -74,7 +74,7 @@ func (s *CategoryService) ListCategories(ctx context.Context, req *ListCategorie
 // Update Category
 func (s *CategoryService) UpdateCategory(ctx context.Context, req *UpdateCategoryRequest) (*UpdateCategoryResponse, error) {
 	if req.Msg.Name == "" {
-		return nil, connect.NewError(connect.CodeNotFound, errors.New("Name is Required"))
+		return nil, connect.NewError(connect.CodeNotFound, errors.New("name is required"))
 	}
 	data := repository.UpdateCategoryParams{
 		ID:   req.Msg.Id,

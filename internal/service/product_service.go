@@ -37,7 +37,7 @@ func (s *ProductService) CreateProduct(ctx context.Context, req *CreateProductRe
 	category, _ := s.queries.CountCategory(context.Background(), req.Msg.CategoryId)
 
 	if category == 0 {
-		return nil, connect.NewError(connect.CodeNotFound, errors.New("Category Not Found"))
+		return nil, connect.NewError(connect.CodeNotFound, errors.New("category not found"))
 	}
 	// input data from message protobuf
 	var data = repository.CreateProductParams{
@@ -68,7 +68,7 @@ func (s *ProductService) GetProduct(ctx context.Context, req *GetProductRequest)
 	}
 
 	if product.Product.ID == 0 {
-		return nil, connect.NewError(connect.CodeNotFound, errors.New("Product Not Found"))
+		return nil, connect.NewError(connect.CodeNotFound, errors.New("product is not found"))
 	}
 
 	// return to protobuf message
